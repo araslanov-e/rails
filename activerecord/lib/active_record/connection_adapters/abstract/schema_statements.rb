@@ -527,6 +527,8 @@ module ActiveRecord
       #   column will have the same collation as the table.
       # * <tt>:comment</tt> -
       #   Specifies the comment for the column. This option is ignored by some backends.
+      # * <tt>:index</tt> -
+      #   Add an appropriate index. Defaults to false. See #add_index for usage of this option.
       #
       # Note: The precision is the total number of significant digits,
       # and the scale is the number of digits that can be stored following
@@ -579,9 +581,13 @@ module ActiveRecord
       #  add_column(:shapes, :triangle, 'polygon')
       #  # ALTER TABLE "shapes" ADD "triangle" polygon
       def add_column(table_name, column_name, type, options = {})
+        index_options = options.delete(:index)
+
         at = create_alter_table table_name
         at.add_column(column_name, type, options)
         execute schema_creation.accept at
+
+        add_index(table_name, column_name, index_options.is_a?(Hash) ? index_options : {}) if index_options
       end
 
       # Removes the given columns from the table definition.

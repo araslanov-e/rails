@@ -45,6 +45,12 @@ module ActiveRecord
         assert_nil TestModel.columns_hash["description"].limit
       end
 
+      def test_add_column_with_index
+        add_column :test_models, :email, :string, index: true
+
+        assert_equal [%w(email)], connection.indexes(:test_models).map(&:columns)
+      end
+
       if current_adapter?(:Mysql2Adapter, :PostgreSQLAdapter)
         def test_unabstracted_database_dependent_types
           add_column :test_models, :intelligence_quotient, :smallint
